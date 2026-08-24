@@ -312,7 +312,6 @@ export function ProfileTab({
                   >
                     <FormControlLabel value="Male" control={<Radio />} label="Male" />
                     <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                    <FormControlLabel value="Other" control={<Radio />} label="Other" />
                   </RadioGroup>
                 </FormControl>
               </Box>

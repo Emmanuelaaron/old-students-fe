@@ -55,7 +55,7 @@ export function mapMember(raw: Record<string, unknown>): Member {
     dateOfBirth: String(raw.dateOfBirth ?? raw.date_of_birth ?? "").slice(0, 10),
     tel: String(raw.tel ?? ""),
     address: String(raw.address ?? ""),
-    gender: (raw.gender as Gender) || "Other",
+    gender: (raw.gender as Gender) || "Male",
     email: String(raw.email ?? ""),
     approved: Boolean(raw.approved),
     role,

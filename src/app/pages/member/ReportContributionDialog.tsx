@@ -20,6 +20,7 @@ import { Form, Formik } from "formik";
 import {
   getMonthsFrom,
   isLate,
+  isPastDue,
   selectFineAmount,
   selectMonthlyContribution,
   useAppSelector,
@@ -54,7 +55,7 @@ export function ReportContributionDialog({
         .filter(c => c.memberId === user.id && (c.status === "approved" || c.status === "pending"))
         .map(c => c.month)
     );
-    return getMonthsFrom(user.joinedAt).filter(m => !taken.has(m)).reverse();
+    return getMonthsFrom(user.joinedAt).filter(m => !taken.has(m) && isPastDue(m));
   }, [contributions, user.id, user.joinedAt]);
 
   useEffect(() => {
@@ -103,9 +104,20 @@ export function ReportContributionDialog({
                     disableCloseOnSelect
                     options={availableMonths}
                     value={values.months}
-                    onChange={(_, value) => setFieldValue("months", value)}
+                    onChange={(_, value) => {
+                      const valid: string[] = [];
+                      for (const m of availableMonths) {
+                        if (value.includes(m)) valid.push(m);
+                        else break;
+                      }
+                      setFieldValue("months", valid);
+                    }}
                     onBlur={() => setFieldTouched("months", true)}
                     getOptionLabel={opt => fmtMonth(opt)}
+                    getOptionDisabled={option => {
+                      const idx = availableMonths.indexOf(option);
+                      return idx > 0 && !values.months.includes(availableMonths[idx - 1]);
+                    }}
                     renderOption={(props, option, { selected }) => (
                       <li {...props} key={option}>
                         <Checkbox checked={selected} sx={{ mr: 1 }} />
@@ -122,13 +134,13 @@ export function ReportContributionDialog({
                       <TextField
                         {...params}
                         label="Months paying for"
-                        placeholder={availableMonths.length ? "Select months" : "No unpaid months"}
+                        placeholder={availableMonths.length ? "Select months" : "No overdue months"}
                         error={touched.months && Boolean(errors.months)}
                         helperText={
                           (touched.months && (errors.months as string)) ||
                           (availableMonths.length
-                            ? "You can select multiple months in one submission"
-                            : "All months are already reported or paid")
+                            ? "Pay the oldest overdue month first"
+                            : "No overdue months to pay")
                         }
                       />
                     )}
