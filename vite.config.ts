@@ -1,8 +1,8 @@
+
 import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-
 
 function figmaAssetResolver() {
   return {
@@ -23,18 +23,19 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       figmaAssetResolver(),
-      // The React and Tailwind plugins are both required for Make, even if
-      // Tailwind is not being actively used – do not remove them
+      // The React and Tailwind plugins are both required for Make.
       react(),
       tailwindcss(),
     ],
+
     resolve: {
       alias: {
-        // Alias @ to the src directory
         '@': path.resolve(__dirname, './src'),
       },
     },
+
     server: {
+      host: '0.0.0.0',
       proxy: {
         '/api': {
           target: apiBaseUrl,
@@ -43,7 +44,13 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
+    preview: {
+      host: '0.0.0.0',
+      port: Number(process.env.PORT) || 4173,
+      allowedHosts: ['old-students-fe.onrender.com'],
+    },
+
+    // Do not add .css, .tsx, or .ts files here.
     assetsInclude: ['**/*.svg', '**/*.csv'],
   }
 })
