@@ -1,5 +1,13 @@
 import { CONTRIBUTION, FINE_AMT, STORAGE_KEYS } from "./types";
 
+const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
+function apiUrl(path: string): string {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const apiPath = normalized.startsWith("/api/") ? normalized : `/api/v1${normalized}`;
+  return API_ORIGIN ? `${API_ORIGIN}${apiPath}` : apiPath;
+}
+
 export class ApiError extends Error {
   status: number;
   data?: Record<string, unknown>;
@@ -40,7 +48,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`/api/v1${path}`, {
+  const res = await fetch(apiUrl(path), {
     ...rest,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -75,7 +83,7 @@ export async function apiFormRequest<T>(
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`/api/v1${path}`, {
+  const res = await fetch(apiUrl(path), {
     method,
     headers,
     body: formData,
@@ -102,7 +110,7 @@ export async function apiBlobUrl(path: string): Promise<string> {
   const token = getStoredToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(path.startsWith("/api/") ? path : `/api/v1${path}`, { headers });
+  const res = await fetch(apiUrl(path), { headers });
   if (!res.ok) throw new ApiError(`Could not load file (${res.status})`, res.status);
   const blob = await res.blob();
   return URL.createObjectURL(blob);

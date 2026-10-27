@@ -34,8 +34,9 @@ export function LandingPage({
     <Box
       data-landing="true"
       sx={{
-        height: "100%",
-        maxHeight: "100dvh",
+        flex: 1,
+        minHeight: "100dvh",
+        width: "100%",
         bgcolor: "#1b2d5e",
         display: "flex",
         flexDirection: "column",

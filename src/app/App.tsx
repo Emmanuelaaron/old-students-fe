@@ -133,7 +133,8 @@ export default function App() {
     );
   }
 
-  const showHeader = location.pathname !== "/";
+  const isLanding = location.pathname === "/";
+  const showHeader = !isLanding;
 
   const requireUser = (element: React.ReactNode) =>
     user ? element : <Navigate to="/login" replace />;
@@ -151,7 +152,14 @@ export default function App() {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: isLanding ? "#1b2d5e" : undefined,
+      }}
+    >
       {showHeader && <AppHeader user={user} onLogout={() => void logout()} />}
 
       <Routes>
